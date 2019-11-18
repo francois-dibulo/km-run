@@ -14,18 +14,33 @@
       overflow: hidden;
       font-family: Arial, sans-serif;
     }
+
+    * { box-sizing: border-box; }
+
+    #swipe-area {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: 2px solid #CCC;
+    }
   </style>
 </head>
 <body>
   <div id="phaser-container"></div>
+  <div id="swipe-area"></div>
 
   <script type="text/javascript" src="js/libs/phaser.min.js"></script>
+  <script type="text/javascript" src="js/libs/swipe.js"></script>
   <script type="text/javascript" src="js/libs/utils.js"></script>
   <!-- SCENES -->
   <script type="text/javascript" src="js/scenes/base_scene.js"></script>
   <script type="text/javascript" src="js/scenes/game_scene.js"></script>
   <!-- GAME OBJECTS -->
-  <!-- <script type="text/javascript" src="js/game_objects/unit.js"></script> -->
+  <script type="text/javascript" src="js/game_objects/countdown_rectangle.js"></script>
   <!-- INIT -->
   <script type="text/javascript" src="js/init.js"></script>
 </body>

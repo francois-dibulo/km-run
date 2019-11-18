@@ -2,14 +2,10 @@ function initGame() {
 
   var config = {
     type: Phaser.AUTO,
-    width: 960,
-    height: 540,
+    width: window.innerWidth,
+    height: window.innerHeight,
     parent: 'phaser-container',
-    backgroundColor: '#111111',
-    physics: {
-      // default: 'arcade',
-      // arcade: { debug: false }
-    },
+    backgroundColor: '#F6F6F6',
     scene: [
       GameScene
     ]
