@@ -2,6 +2,7 @@
   - Score
   - Inverse movement
   - Onboarding
+  - make it faster
   - Replace dude
 */
 class GameScene extends BaseScene {
@@ -10,6 +11,7 @@ class GameScene extends BaseScene {
     super("Game");
     this.current_direction = 0;
     this.dude_sprite = null;
+    this.explain_image = null;
     this.Color = {
       Default: "#CCC",
       Wrong: "#f44336",
@@ -22,10 +24,13 @@ class GameScene extends BaseScene {
     this.reset_time_ms = 1000;
     this.countdown_rect = null;
     this.move_tween = null;
+    this.onboard_steps = [1, 2, 3, 4, 5, 6, 7, 8];
+    this.swipe_counts = 0;
   }
 
   preload() {
     this.load.spritesheet('dude', 'dude.png', { frameWidth: 128, frameHeight: 128 });
+    this.load.image("dir_help", 'dirs.png');
   }
 
   // =====================================================================================
@@ -110,17 +115,34 @@ class GameScene extends BaseScene {
     this.start_y = bbox.center_y + 64;
     this.dude_sprite = this.add.sprite(this.start_x, this.start_y, 'dude').play('walk_1');
 
+    this.explain_image = this.add.image(this.start_x, this.start_y, 'dir_help')
+
     this.setRandomDirection();
   }
 
   setRandomDirection() {
     this.walked_x = 0;
     this.walked_y = 0;
-    this.current_direction = Phaser.Math.Between(1, 8);
+
+    if (this.onboard_steps.length > 0) {
+      this.current_direction = this.onboard_steps.shift();
+    } else {
+      this.current_direction = Phaser.Math.Between(1, 8);
+    }
+
     this.direction_txt.setColor(this.Color.Default);
     this.direction_txt.setText(this.current_direction);
     this.swipe_clear = true;
     this.countdown_rect.start(this.swipe_time_ms);
+
+    if (this.swipe_counts === 8) {
+      this.explain_image.destroy();
+    }
+
+    // Every x swipe, increase the speed
+    if (this.swipe_counts > 0 && this.swipe_counts % 10 === 0) {
+      this.swipe_time_ms = Math.max(800, this.swipe_time_ms - 500);
+    }
   }
 
   onSwipe(data) {
@@ -172,6 +194,7 @@ class GameScene extends BaseScene {
     this.walked_x = x;
     this.walked_y = y;
 
+    this.swipe_counts++;
     this.dude_sprite.play('walk_' + direction);
     this.tweenPlayer(x, y);
     this.evaluateMove(direction);
