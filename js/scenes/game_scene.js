@@ -26,6 +26,8 @@ class GameScene extends BaseScene {
     this.move_tween = null;
     this.onboard_steps = [1, 2, 3, 4, 5, 6, 7, 8];
     this.swipe_counts = 0;
+
+    this.live_bar = null;
   }
 
   preload() {
@@ -39,6 +41,9 @@ class GameScene extends BaseScene {
 
   create() {
     var bbox = this.getBBox();
+
+    this.live_bar = new LiveBarsContainer(this, 10, bbox.center_y);
+    this.live_bar.on("ON_DEAD", this.onDead.bind(this));
 
     var h = 10;
     this.countdown_rect = new CountdownRectangle(this, 0, bbox.bottom - h, bbox.right, h, 0x2196f3);
@@ -98,14 +103,14 @@ class GameScene extends BaseScene {
     });
 
     this.anims.create({
-      key: 'walk_7',
+      key: 'walk_8',
       frames: this.anims.generateFrameNames('dude', { frames: [83, 84, 85, 86, 87, 52] }),
       repeat: 0,
       duration: 400
     });
 
     this.anims.create({
-      key: 'walk_8',
+      key: 'walk_7',
       frames: this.anims.generateFrameNames('dude', { frames: [86, 85, 84, 83, 82, 52] }),
       repeat: 0,
       duration: 400
@@ -118,6 +123,10 @@ class GameScene extends BaseScene {
     this.explain_image = this.add.image(this.start_x, this.start_y, 'dir_help')
 
     this.setRandomDirection();
+  }
+
+  onDead() {
+    console.log("DEAD");
   }
 
   setRandomDirection() {
@@ -169,8 +178,8 @@ class GameScene extends BaseScene {
       8: 4,
       5: 5,
       10: 6,
-      9: 7,
-      6: 8
+      6: 7,
+      9: 8
     };
 
     var direction = sum_dir_map[sum];
@@ -178,16 +187,16 @@ class GameScene extends BaseScene {
     var y = 0;
     var distance = 50;
 
-    if (direction === 1 || direction === 5 || direction === 7) {
+    if (direction === 1 || direction === 5 || direction === 8) {
       y = -distance;
     }
-    if (direction === 2 || direction === 8 || direction === 6) {
+    if (direction === 2 || direction === 7 || direction === 6) {
       y = distance;
     }
-    if (direction === 3 || direction === 5 || direction === 8) {
+    if (direction === 3 || direction === 5 || direction === 7) {
       x = -distance;
     }
-    if (direction === 4 || direction === 7 || direction === 6) {
+    if (direction === 4 || direction === 8 || direction === 6) {
       x = distance;
     }
 
@@ -228,8 +237,10 @@ class GameScene extends BaseScene {
   evaluateMove(swiped_direction) {
     if (this.current_direction === swiped_direction) {
       this.direction_txt.setColor(this.Color.Correct);
+      this.live_bar.updateLive(1);
     } else {
       this.direction_txt.setColor(this.Color.Wrong);
+      this.live_bar.updateLive(-1);
     }
 
     this.countdown_rect.pause();
