@@ -13,7 +13,7 @@ class GameScene extends BaseScene {
     this.dude_sprite = null;
     this.explain_image = null;
     this.Color = {
-      Default: "#CCC",
+      Default: "#555",
       Wrong: "#f44336",
       Correct: "#8bc34a"
     }
@@ -26,8 +26,11 @@ class GameScene extends BaseScene {
     this.move_tween = null;
     this.onboard_steps = [1, 2, 3, 4, 5, 6, 7, 8];
     this.swipe_counts = 0;
-
     this.live_bar = null;
+    this.correct_swipes = 0;
+    this.max_correct_swipes = 0;
+    this.correct_swipes_txt = null;
+    this.max_correct_swipes_txt = null;
   }
 
   preload() {
@@ -42,7 +45,7 @@ class GameScene extends BaseScene {
   create() {
     var bbox = this.getBBox();
 
-    this.live_bar = new LiveBarsContainer(this, 10, bbox.center_y);
+    this.live_bar = new LiveBarsContainer(this, 10, bbox.center_y + 27);
     this.live_bar.on("ON_DEAD", this.onDead.bind(this));
 
     var h = 10;
@@ -55,8 +58,18 @@ class GameScene extends BaseScene {
       onTrigger: this.onSwipe.bind(this)
     });
 
-    this.direction_txt = this.add.text(bbox.center_x, 80, '', { fontFamily: 'Arial', fontSize: 120, color: '#CCC' });
+    this.direction_txt = this.add.text(bbox.center_x, 80, '', { fontFamily: 'Arial', fontSize: 120, color: this.Color.Default });
     this.direction_txt.setOrigin(0.5);
+
+    // Current points
+    this.correct_swipes_txt = this.add.text(bbox.center_x - 100, 80, '0', { fontFamily: 'Arial', fontSize: 48, color: '#CCC' });
+    this.correct_swipes_txt.setOrigin(0.5);
+    var correct_swipes_txt_label = this.add.text(bbox.center_x - 110, 104, 'Pts.', { fontFamily: 'Arial', fontSize: 14, color: '#CCC' });
+
+    // Max current points
+    this.max_correct_swipes_txt = this.add.text(bbox.center_x + 100, 80, '0', { fontFamily: 'Arial', fontSize: 48, color: '#CCC' });
+    this.max_correct_swipes_txt.setOrigin(0.5);
+    var correct_max_swipes_txt_label = this.add.text(bbox.center_x + 75, 104, 'Max. Pts.', { fontFamily: 'Arial', fontSize: 14, color: '#CCC' });
 
     var fwd_ani = [52, 53, 54, 55, 54, 53, 52];
 
@@ -127,6 +140,10 @@ class GameScene extends BaseScene {
 
   onDead() {
     console.log("DEAD");
+    this.correct_swipes = 0;
+    this.swipe_time_ms = 3000;
+    this.reset_time_ms = 1000;
+    this.correct_swipes_txt.setText(this.correct_swipes);
   }
 
   setRandomDirection() {
@@ -238,6 +255,12 @@ class GameScene extends BaseScene {
     if (this.current_direction === swiped_direction) {
       this.direction_txt.setColor(this.Color.Correct);
       this.live_bar.updateLive(1);
+      this.correct_swipes++;
+      if (this.max_correct_swipes < this.correct_swipes) {
+        this.max_correct_swipes = this.correct_swipes;
+        this.max_correct_swipes_txt.setText(this.correct_swipes);
+      }
+      this.correct_swipes_txt.setText(this.correct_swipes);
     } else {
       this.direction_txt.setColor(this.Color.Wrong);
       this.live_bar.updateLive(-1);
